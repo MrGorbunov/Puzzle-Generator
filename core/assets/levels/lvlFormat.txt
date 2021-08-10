@@ -1,0 +1,6 @@
+width height
+
+# = Wall
+* = Floor
+$ = Finish
+& = Player Start
