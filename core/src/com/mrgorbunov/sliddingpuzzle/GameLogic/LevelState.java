@@ -41,6 +41,16 @@ public class LevelState {
 		levelBeat = false;
 	}
 
+	public boolean canMoveInDir (Direction dir) {
+		int[] delta = dir.getDelta();
+
+		int testX = playerX + delta[0];
+		int testY = playerY + delta[1];
+
+		return (testX >= 0 && testX < WIDTH && testY >= 0 && testY < HEIGHT) &&
+			layout[testX][testY] != Tile.WALL;
+	}
+
 	/**
 	 * Moves the player along the specified direction until either
 	 * hitting a wall or the exit. Does nothing if the level is beat

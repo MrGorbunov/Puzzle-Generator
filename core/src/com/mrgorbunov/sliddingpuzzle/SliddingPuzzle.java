@@ -6,9 +6,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelParser;
@@ -30,26 +32,36 @@ public class SliddingPuzzle extends ApplicationAdapter {
 
 	LevelState level;
 
+	boolean animationPlaying;
+
+	// TODO: Seperate this logic out of the main method
+	// Animation logic
+	long animStart;
+	float startX;
+	float startY;
+	float endX;
+	float endY;
+	float normDirX;
+	float normDirY;
+
+	Texture texAnimation;
+	float curX;
+	float curY;
+
+	// These are used to define the velocity curve (which is a method)
+	final float EPSILON_ANIM_EQUALS = 0.0001f;
+	float MAX_SPEED; // px / second
+	final long ACCEL_TIME_MILLIS = 250;
+
 	
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
-
-		// Tile[][] gameLevel = new Tile[][] {
-		// 	new Tile[] {Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR},
-		// 	new Tile[] {Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR},
-		// 	new Tile[] {Tile.FLOOR,  Tile.WALL,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR},
-		// 	new Tile[] {Tile.FLOOR,  Tile.FLOOR,  Tile.WALL,  Tile.FLOOR,  Tile.FLOOR},
-		// 	new Tile[] {Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR},
-		// 	new Tile[] {Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FINISH,  Tile.FLOOR},
-		// 	new Tile[] {Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR},
-		// 	new Tile[] {Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR},
-		// 	new Tile[] {Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR,  Tile.FLOOR}
-		// };
-		// gameLevel = Tile.flipLayout(gameLevel);
-
 		level = LevelParser.parseFile("levels/lvl0.txt");
 		level.printLevel();
+
+
+		// Texture loading
+		batch = new SpriteBatch();
 
 		texWall = new Texture(Gdx.files.internal("img/wall.png"));
 		texFloor = new Texture(Gdx.files.internal("img/floor.png"));
@@ -59,27 +71,39 @@ public class SliddingPuzzle extends ApplicationAdapter {
 		texWall.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 		background = new TextureRegion(texWall, -20f, -20f, 20 + level.getWidth(), 20 + level.getHeight());
 
-		// All textures are squares, so height = width
-		tileSizePx = texWall.getHeight();
 
+		// Setup camera to show entire level, and be centered
 		if (level.getWidth() < level.getHeight())
 			camera = new OrthographicCamera(level.getWidth(), level.getWidth() * 720 / 1080);
 		else
 			camera = new OrthographicCamera(level.getHeight() * 1080 / 720, level.getHeight());
 
+		tileSizePx = texWall.getHeight();
 		camera.zoom = tileSizePx * 1.1f;
-
-		// Move camera to be centered on level
 		camera.position.set(level.getWidth() * tileSizePx / 2, level.getHeight() * tileSizePx / 2, 0);
+
+
+		// Animation Setting
+		animationPlaying = false;
+		MAX_SPEED = 100 * tileSizePx;
 	}
 
 	@Override
 	public void render () {
+		//
+		// Updating Call
+		//
+
 		handleInput();
+
+
+
+		//
+		// Draw Call
+		//
 
 		ScreenUtils.clear(1, 1, 1, 1);
 		camera.update();
-		// System.out.println(camera.position.toString());
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
@@ -111,13 +135,21 @@ public class SliddingPuzzle extends ApplicationAdapter {
 		}
 
 		// Draw the player
-		int playerPxX = level.getPlayerX() * tileSizePx;
-		int playerPxY = level.getPlayerY() * tileSizePx;
-		batch.draw(texPlayer, playerPxX, playerPxY);
+		if (animationPlaying) {
+			animationTick();
+
+			batch.draw(texAnimation, curX, curY);
+
+			if (animationOver())
+				animationPlaying = false;
+		} else {
+			int playerPxX = level.getPlayerX() * tileSizePx;
+			int playerPxY = level.getPlayerY() * tileSizePx;
+			batch.draw(texPlayer, playerPxX, playerPxY);
+		}
 
 
 		batch.end();
-		
 	}
 
 	void handleInput () {
@@ -140,20 +172,28 @@ public class SliddingPuzzle extends ApplicationAdapter {
 			camera.translate(0, 0.05f * camera.zoom, 0);
 		}
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-			level.makeMove(Direction.LEFT);
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-			level.makeMove(Direction.RIGHT);
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-			level.makeMove(Direction.UP);
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-			level.makeMove(Direction.DOWN);
-		}
+		if (!animationPlaying) {
+			if (level.canMoveInDir(Direction.LEFT) &&
+				Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+					makeMoveAndStartAnimation(Direction.LEFT);
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-			level.resetLevel();
-		}
+			} else if (level.canMoveInDir(Direction.RIGHT) &&
+				Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+					makeMoveAndStartAnimation(Direction.RIGHT);
 
+			} else if (level.canMoveInDir(Direction.UP) &&
+				Gdx.input.isKeyPressed(Input.Keys.UP)) {
+					makeMoveAndStartAnimation(Direction.UP);
+
+			} else if (level.canMoveInDir(Direction.DOWN) &&
+				Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+					makeMoveAndStartAnimation(Direction.DOWN);
+			}
+
+			if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+				level.resetLevel();
+			}
+		}
 
 
 		// if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
@@ -164,8 +204,96 @@ public class SliddingPuzzle extends ApplicationAdapter {
 		// }
 
 	}
+
+	void makeMoveAndStartAnimation (Direction dir) {
+		float pX = level.getPlayerX() * tileSizePx;
+		float pY = level.getPlayerY() * tileSizePx;
+
+		level.makeMove(dir);
+
+		float newPx = level.getPlayerX() * tileSizePx;
+		float newPy = level.getPlayerY() * tileSizePx;
+
+		animationPlaying = true;
+		startAnimation(pX, pY, newPx, newPy);
+	}
 	
 	@Override
 	public void dispose () {
 	}
+
+
+
+
+
+
+	//
+	// Animation Logic (very poor that it's here rn)
+	//
+
+	void startAnimation (float startX, float startY, float endX, float endY) {
+		animStart = TimeUtils.millis();
+
+		this.startX = startX;
+		this.startY = startY;
+		this.endX = endX;
+		this.endY = endY;
+
+		curX = startX;
+		curY = startY;
+		texAnimation = texPlayer;
+
+		Vector2 offset = new Vector2(endX - startX, endY - startY);
+		offset.nor();
+		normDirX = offset.x;
+		normDirY = offset.y;
+	}
+
+	void animationTick () {
+		float speed = speed();
+		speed *= Gdx.graphics.getDeltaTime();
+		
+		curX += normDirX * speed;
+		curY += normDirY * speed;
+
+		// Checking for overshooting
+		if (animationOver()) {
+			curX = endX;
+			curY = endY;
+		}
+	}
+
+	boolean animationOver () {
+		// To detect overshooting, a dot product is taken between 
+		// curPos -> end & start -> end
+		// If the two are pointed the same way (i.e the animation is still progressing)
+		// the dot product is positive, and if it's overshot then it's negative.
+		Vector2 posToEnd = new Vector2(curX - endX, curY - endY);
+		Vector2 startToEnd = new Vector2(startX - endX, startY - endY);
+		return posToEnd.dot(startToEnd) <= EPSILON_ANIM_EQUALS;
+	}
+
+	/**
+	 * Speed curve looks like this:
+	 * 
+	 * 		/-------
+	 *	   / 
+	 *	  / 
+	 *   /
+	 * 
+	 * Plateous at MAX_VEL, after ACCEL_TIME_MILLIS milliseconds.
+	 * 
+	 * Note: The speed should be multiplied by time delta, this function
+	 * 		does NOT do that
+	 */
+	private float speed () {
+		long timeElapsed = TimeUtils.millis() - animStart;
+
+		if (timeElapsed >= ACCEL_TIME_MILLIS)
+			return MAX_SPEED;
+
+		return timeElapsed * MAX_SPEED / (float) ACCEL_TIME_MILLIS;
+	}
+
+
 }
