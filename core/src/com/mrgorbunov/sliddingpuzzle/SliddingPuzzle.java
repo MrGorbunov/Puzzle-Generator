@@ -5,9 +5,19 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -18,6 +28,7 @@ import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelState;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 
 public class SliddingPuzzle extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -53,6 +64,14 @@ public class SliddingPuzzle extends ApplicationAdapter {
 	float MAX_SPEED; // px / second
 	final long ACCEL_TIME_MILLIS = 250;
 
+
+
+	// GUI
+	private Stage stage;
+	private Table table;
+
+	private Skin skin;
+
 	
 	@Override
 	public void create () {
@@ -86,6 +105,44 @@ public class SliddingPuzzle extends ApplicationAdapter {
 		// Animation Setting
 		animationPlaying = false;
 		MAX_SPEED = 100 * tileSizePx;
+
+
+		
+		//
+		// GUI
+		// FileHandle packFile = Gdx.files.internal("skin/metal-ui.atlas");
+		// TextureAtlas skinTexs = new TextureAtlas(packFile);
+		skin = new Skin(Gdx.files.internal("skin/metal-ui.json"));
+
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+
+		table = new Table();
+		table.setFillParent(true);
+		stage.addActor(table);;
+
+		table.setDebug(true);
+
+
+		// Button
+		TextButtonStyle buttonStyle = skin.get("default", TextButtonStyle.class);
+		TextButton button = new TextButton("Oompa Loompa", buttonStyle);
+		TextButton resetButton = new TextButton("Reset", buttonStyle);
+
+		resetButton.addListener(new ChangeListener() {
+			public void changed (ChangeEvent event, Actor actor) {
+				level.resetLevel();
+			}
+		});
+
+		// TextButton button = new TextButton("Oompa Loompa", skin, "default");
+		table.add(button);
+		table.row();
+		table.add(resetButton);
+
+		table.left();
+		table.top();
+		table.pad(50);
 	}
 
 	@Override
@@ -150,6 +207,13 @@ public class SliddingPuzzle extends ApplicationAdapter {
 
 
 		batch.end();
+
+
+		//
+		// GUI Call
+		
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
 	}
 
 	void handleInput () {
@@ -220,6 +284,9 @@ public class SliddingPuzzle extends ApplicationAdapter {
 	
 	@Override
 	public void dispose () {
+
+		// TODO
+
 	}
 
 
