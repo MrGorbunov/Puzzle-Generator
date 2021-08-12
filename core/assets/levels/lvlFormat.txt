@@ -1,5 +1,5 @@
+Version number (V0.1, V0.3, V24.3, etc)
 width height
-
 # = Wall
 * = Floor
 $ = Finish

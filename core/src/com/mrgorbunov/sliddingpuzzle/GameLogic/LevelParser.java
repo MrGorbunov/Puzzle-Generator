@@ -17,11 +17,14 @@ public class LevelParser {
 		String levelStr = file.readString();
 
 		String[] lineByLine = levelStr.split("\n");
-		if (lineByLine.length < 2) {
+		if (lineByLine.length < 3) {
 			throw new IllegalArgumentException("Improper level format");
 		}
 
-		String[] lvlDimensionsStr = lineByLine[0].split(" ");
+		String versionStr = lineByLine[0];
+		System.out.println(String.format("Level file format: %s", versionStr));
+
+		String[] lvlDimensionsStr = lineByLine[1].split(" ");
 		int width = Integer.parseInt(lvlDimensionsStr[0]);
 		int height = Integer.parseInt(lvlDimensionsStr[1]);
 
@@ -35,7 +38,7 @@ public class LevelParser {
 		}
 
 		for (int y=0; y<height; y++) {
-			int correctRow = height - y;
+			int correctRow = height - y + 1;
 			char[] rowArr = lineByLine[correctRow].toCharArray();
 
 			for (int x=0; x<width; x++) {
