@@ -1,5 +1,7 @@
 package com.mrgorbunov.sliddingpuzzle;
 
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -30,7 +32,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 
-public class SliddingPuzzle extends ApplicationAdapter {
+public class PuzzleScreen implements Screen {
+
 	SpriteBatch batch;
 	OrthographicCamera camera;
 
@@ -72,12 +75,10 @@ public class SliddingPuzzle extends ApplicationAdapter {
 
 	private Skin skin;
 
-	
-	@Override
-	public void create () {
+
+	public PuzzleScreen () {
 		level = LevelParser.parseFile("levels/lvl0.txt");
 		level.printLevel();
-
 
 		// Texture loading
 		batch = new SpriteBatch();
@@ -143,10 +144,17 @@ public class SliddingPuzzle extends ApplicationAdapter {
 		table.left();
 		table.top();
 		table.pad(50);
+
+
+	}
+
+
+	@Override
+	public void show() {
 	}
 
 	@Override
-	public void render () {
+	public void render(float delta) {
 		//
 		// Updating Call
 		//
@@ -216,6 +224,8 @@ public class SliddingPuzzle extends ApplicationAdapter {
 		stage.draw();
 	}
 
+
+
 	void handleInput () {
 		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
 			camera.zoom *= 1.02;
@@ -269,6 +279,7 @@ public class SliddingPuzzle extends ApplicationAdapter {
 
 	}
 
+
 	void makeMoveAndStartAnimation (Direction dir) {
 		float pX = level.getPlayerX() * tileSizePx;
 		float pY = level.getPlayerY() * tileSizePx;
@@ -281,14 +292,6 @@ public class SliddingPuzzle extends ApplicationAdapter {
 		animationPlaying = true;
 		startAnimation(pX, pY, newPx, newPy);
 	}
-	
-	@Override
-	public void dispose () {
-
-		// TODO
-
-	}
-
 
 
 
@@ -363,4 +366,35 @@ public class SliddingPuzzle extends ApplicationAdapter {
 	}
 
 
+	
+
+	@Override
+	public void dispose() {
+	}
+
+	@Override
+	public void pause() {
+		System.out.println("Just paused");
+	}
+
+
+
+
+	//
+	// Unused methods 
+	// (because only target is desktop & window is non-resizable)
+
+	@Override
+	public void resize(int width, int height) {
+	}
+
+	@Override
+	public void resume() {
+	}
+
+	@Override
+	public void hide() {
+	}
+
+	
 }
