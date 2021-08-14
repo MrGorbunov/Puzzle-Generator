@@ -29,6 +29,7 @@ import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelParser;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelState;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
+import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
@@ -77,8 +78,16 @@ public class ScreenPuzzle implements Screen {
 	private Skin skin = RuntimeGlobals.skin;
 
 
-	public ScreenPuzzle (FileHandle levelFile) {
-		level = LevelParser.parseFile(levelFile);
+	public ScreenPuzzle () {
+		// Load level
+		LevelInfo activeLevel = RuntimeGlobals.activeLevel;
+		level = LevelParser.parseFile(activeLevel.file);
+
+		if (level == null) {
+			Gdx.app.error("ScreenSwitch", "Switched to puzzle screen without active level in runtimeGlobals");
+			Gdx.app.exit();
+			System.exit(0);
+		}
 		level.printLevel();
 
 		// Texture loading
