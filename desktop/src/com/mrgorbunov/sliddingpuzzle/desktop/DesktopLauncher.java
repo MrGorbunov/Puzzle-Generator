@@ -2,7 +2,7 @@ package com.mrgorbunov.sliddingpuzzle.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.mrgorbunov.sliddingpuzzle.GameMain;
+import com.mrgorbunov.sliddingpuzzle.GameRuntime;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
@@ -10,6 +10,6 @@ public class DesktopLauncher {
 		config.width = 1080;
 		config.height = 720;
 		config.resizable = false;
-		new LwjglApplication(new GameMain(), config);
+		new LwjglApplication(new GameRuntime(), config);
 	}
 }
