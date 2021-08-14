@@ -12,21 +12,34 @@ import com.badlogic.gdx.files.FileHandle;
  */
 public class LevelParser {
 
-	public static LevelState parseFile (String filePath) {
-		FileHandle file = Gdx.files.internal(filePath);
+	/**
+	 * Returns a valid LevelState if the file is parsable,
+	 * otherwise null.
+	 */
+	public static LevelState parseFile (FileHandle file) {
 		String levelStr = file.readString();
 
 		String[] lineByLine = levelStr.split("\n");
 		if (lineByLine.length < 3) {
-			throw new IllegalArgumentException("Improper level format");
+			Gdx.app.error("LevelParsing", "Improper level format - the file must be at least 3 lines long");
+			return null;
 		}
 
 		String versionStr = lineByLine[0];
-		System.out.println(String.format("Level file format: %s", versionStr));
+		if (!versionStr.equals("V0.1")) {
+			Gdx.app.error("LevelParsing", "Unsupported level format version");
+			return null;
+		}
 
 		String[] lvlDimensionsStr = lineByLine[1].split(" ");
-		int width = Integer.parseInt(lvlDimensionsStr[0]);
-		int height = Integer.parseInt(lvlDimensionsStr[1]);
+		int width, height = 0;
+		try {
+			width = Integer.parseInt(lvlDimensionsStr[0]);
+			height = Integer.parseInt(lvlDimensionsStr[1]);
+		} catch (NumberFormatException nfe) {
+			Gdx.app.error("LevelParsing", "Improper level format - could not parse either level width or height");
+			return null;
+		}
 
 
 		Tile[][] levelMap = new Tile[width][height];
@@ -58,8 +71,11 @@ public class LevelParser {
 						break;
 
 					case '&':
-						if (playerX != -1 || playerY != -1)
-							throw new IllegalArgumentException("Supplied map has multiple players");
+						if (playerX != -1 || playerY != -1) {
+							Gdx.app.error("LevelParsing", "Improper level format - multiple player characters");
+							return null;
+						}
+
 						playerX = x;
 						playerY = y;
 
@@ -67,7 +83,8 @@ public class LevelParser {
 						break;
 					
 					default:
-						throw new IllegalArgumentException("Supplied map has illegal characters");
+						Gdx.app.error("LevelParsing", "Improper level format - unrecognized character '" + tileChar + "'");
+						return null;
 				}
 			}
 		}
