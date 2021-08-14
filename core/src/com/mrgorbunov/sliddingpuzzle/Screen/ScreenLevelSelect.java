@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.mrgorbunov.sliddingpuzzle.RuntimeGlobals;
+import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
 
 public class ScreenLevelSelect implements Screen {
 
@@ -35,37 +36,23 @@ public class ScreenLevelSelect implements Screen {
 			}
 		});
 
-		// Generate array of levels
+		// Generate array of buttons for levels
 		Table levelTable = new Table(RuntimeGlobals.skin);
-		String[] levelPaths = new String[] {
-			"levels/lvl0.txt", "levels/lvl1.txt"
-		};
 
-		for (String levelPath : levelPaths) {
-			String[] levelDirpath = levelPath.split("\\.")[0] // remove exentsion
-				.split("/"); // remove file path
-			String name = levelDirpath[levelDirpath.length - 1];
-
+		final int ROW_SIZE = Math.min((int) Math.sqrt((double) RuntimeGlobals.levels.length) + 1, 5);
+		int numInRow = 0;
+		
+		for (LevelInfo level : RuntimeGlobals.levels) {
+			String name = level.levelName;
 			TextButton levelButton = new TextButton(name, skin);
 
-			ChangeListener gotoLevel = new ChangeListener () {
-				private FileHandle levelFileHandle;
-
-				public ChangeListener setFileHandle (FileHandle levelFileHandle) {
-					this.levelFileHandle = levelFileHandle;
-					return this;
-				}
-
-				public void changed (ChangeEvent event, Actor actor) {
-					RuntimeGlobals.game.setScreen(
-						new ScreenPuzzle(levelFileHandle)
-					);
-				}
-			}.setFileHandle(Gdx.files.internal(levelPath));;
-
-			levelButton.addListener(gotoLevel);
+			LevelSwitcher levelSwitcher = new LevelSwitcher(level);
+			levelButton.addListener(levelSwitcher);
 
 			levelTable.add(levelButton);
+			numInRow++;
+			if (numInRow >= ROW_SIZE)
+				levelTable.row();
 		}
 
 		rootTable.add(levelTable);
@@ -105,4 +92,23 @@ public class ScreenLevelSelect implements Screen {
 	public void dispose() {
 	}
 	
+}
+
+
+
+/*
+	Because the GUI system is callback based, this class is needed
+	to programatically generate the level select screen.
+*/
+class LevelSwitcher extends ChangeListener {
+	private LevelInfo level;
+
+	public LevelSwitcher (LevelInfo level) {
+		this.level = level;
+	}
+
+	public void changed (ChangeEvent event, Actor actor) {
+		RuntimeGlobals.activeLevel = level;
+		RuntimeGlobals.game.setScreen(new ScreenPuzzle());
+	}
 }

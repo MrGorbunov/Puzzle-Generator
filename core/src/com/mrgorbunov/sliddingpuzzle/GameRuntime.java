@@ -1,11 +1,15 @@
 package com.mrgorbunov.sliddingpuzzle;
 
+import java.util.Arrays;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelParser;
+import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
 import com.mrgorbunov.sliddingpuzzle.Screen.ScreenMainMenu;
 
 public class GameRuntime extends Game {
@@ -17,14 +21,22 @@ public class GameRuntime extends Game {
 
 		screen = new ScreenMainMenu();
 
-		// Testing out file handling
+		// Load level list
 		FileHandle directoryLevels = Gdx.files.internal("levels/");
 		FileHandle[] levelFiles = directoryLevels.list();
+		Array<LevelInfo> validLevels = new Array<>(levelFiles.length);
 
 		for (FileHandle fh : levelFiles) {
 			if (LevelParser.parseFile(fh) != null)
-				Gdx.app.log("testing", fh.path());
+				validLevels.add(new LevelInfo(fh));
 		}
+
+		LevelInfo[] levelList = new LevelInfo[validLevels.size];
+		for (int i=0; i<levelList.length; i++) {
+			levelList[i] = validLevels.get(i);
+		}
+		Arrays.sort(levelList);
+		RuntimeGlobals.levels = levelList;
 	}
 
 	@Override
