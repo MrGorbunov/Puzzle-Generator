@@ -1,4 +1,4 @@
-package com.mrgorbunov.sliddingpuzzle;
+package com.mrgorbunov.sliddingpuzzle.Screen;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mrgorbunov.sliddingpuzzle.RuntimeGlobals;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelParser;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelState;
@@ -32,7 +33,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 
-public class PuzzleScreen implements Screen {
+public class ScreenPuzzle implements Screen {
 
 	SpriteBatch batch;
 	OrthographicCamera camera;
@@ -73,11 +74,11 @@ public class PuzzleScreen implements Screen {
 	private Stage stage;
 	private Table table;
 
-	private Skin skin;
+	private Skin skin = RuntimeGlobals.skin;
 
 
-	public PuzzleScreen () {
-		level = LevelParser.parseFile("levels/lvl0.txt");
+	public ScreenPuzzle (FileHandle levelFile) {
+		level = LevelParser.parseFile(levelFile);
 		level.printLevel();
 
 		// Texture loading
@@ -100,6 +101,8 @@ public class PuzzleScreen implements Screen {
 
 		tileSizePx = texWall.getHeight();
 		camera.zoom = tileSizePx * 1.1f;
+		if (level.getWidth() <= 5 && level.getHeight() <= 5)
+			camera.zoom = tileSizePx * 2f;
 		camera.position.set(level.getWidth() * tileSizePx / 2, level.getHeight() * tileSizePx / 2, 0);
 
 
@@ -111,10 +114,6 @@ public class PuzzleScreen implements Screen {
 		
 		//
 		// GUI
-		// FileHandle packFile = Gdx.files.internal("skin/metal-ui.atlas");
-		// TextureAtlas skinTexs = new TextureAtlas(packFile);
-		skin = new Skin(Gdx.files.internal("skin/metal-ui.json"));
-
 		stage = new Stage();
 		Gdx.input.setInputProcessor(stage);
 
@@ -122,24 +121,29 @@ public class PuzzleScreen implements Screen {
 		table.setFillParent(true);
 		stage.addActor(table);;
 
-		table.setDebug(true);
+		// table.setDebug(true);
 
 
 		// Button
 		TextButtonStyle buttonStyle = skin.get("default", TextButtonStyle.class);
-		TextButton button = new TextButton("Oompa Loompa", buttonStyle);
-		TextButton resetButton = new TextButton("Reset", buttonStyle);
-
-		resetButton.addListener(new ChangeListener() {
+		TextButton butReset = new TextButton("Reset", buttonStyle);
+		butReset.addListener(new ChangeListener() {
 			public void changed (ChangeEvent event, Actor actor) {
 				level.resetLevel();
 			}
 		});
 
+		TextButton butBack = new TextButton("Back", buttonStyle);
+		butBack.addListener(new ChangeListener () {
+			public void changed (ChangeEvent event, Actor actor) {
+				RuntimeGlobals.game.setScreen(new ScreenLevelSelect());
+			}
+		});
+
 		// TextButton button = new TextButton("Oompa Loompa", skin, "default");
-		table.add(button);
+		table.add(butBack);
 		table.row();
-		table.add(resetButton);
+		table.add(butReset);
 
 		table.left();
 		table.top();
