@@ -36,6 +36,8 @@ import com.badlogic.gdx.files.FileHandle;
 
 public class ScreenPuzzle implements Screen {
 
+	private long frame;
+
 	SpriteBatch batch;
 	OrthographicCamera camera;
 
@@ -79,6 +81,10 @@ public class ScreenPuzzle implements Screen {
 
 
 	public ScreenPuzzle () {
+		Gdx.app.log("PuzzleScreen", "Constructing new puzzle screen");
+
+		frame = 0;
+
 		// Load level
 		LevelInfo activeLevel = RuntimeGlobals.activeLevel;
 		level = LevelParser.parseFile(activeLevel.file);
@@ -171,6 +177,7 @@ public class ScreenPuzzle implements Screen {
 		//
 		// Updating Call
 		//
+		frame++;
 
 		handleInput();
 
@@ -240,53 +247,54 @@ public class ScreenPuzzle implements Screen {
 
 
 	void handleInput () {
-		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+		if (RuntimeGlobals.input.isKeyPressed(Input.Keys.Q)) {
 			camera.zoom *= 1.02;
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+		if (RuntimeGlobals.input.isKeyPressed(Input.Keys.E)) {
 			camera.zoom /= 1.02;
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+		if (RuntimeGlobals.input.isKeyPressed(Input.Keys.A)) {
 			camera.translate(-0.05f * camera.zoom, 0, 0);
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+		if (RuntimeGlobals.input.isKeyPressed(Input.Keys.D)) {
 			camera.translate(0.05f * camera.zoom, 0, 0);
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+		if (RuntimeGlobals.input.isKeyPressed(Input.Keys.S)) {
 			camera.translate(0, -0.05f * camera.zoom, 0);
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+		if (RuntimeGlobals.input.isKeyPressed(Input.Keys.W)) {
 			camera.translate(0, 0.05f * camera.zoom, 0);
 		}
 
 		if (!animationPlaying) {
-			if (level.canMoveInDir(Direction.LEFT) &&
-				Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+			if (level.isValidMove(Direction.LEFT) &&
+				RuntimeGlobals.input.isKeyPressed(Input.Keys.LEFT)) {
 					makeMoveAndStartAnimation(Direction.LEFT);
 
-			} else if (level.canMoveInDir(Direction.RIGHT) &&
-				Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			} else if (level.isValidMove(Direction.RIGHT) &&
+				RuntimeGlobals.input.isKeyPressed(Input.Keys.RIGHT)) {
 					makeMoveAndStartAnimation(Direction.RIGHT);
 
-			} else if (level.canMoveInDir(Direction.UP) &&
-				Gdx.input.isKeyPressed(Input.Keys.UP)) {
+			} else if (level.isValidMove(Direction.UP) &&
+				RuntimeGlobals.input.isKeyPressed(Input.Keys.UP)) {
 					makeMoveAndStartAnimation(Direction.UP);
 
-			} else if (level.canMoveInDir(Direction.DOWN) &&
-				Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+			} else if (level.isValidMove(Direction.DOWN) &&
+				RuntimeGlobals.input.isKeyPressed(Input.Keys.DOWN)) {
 					makeMoveAndStartAnimation(Direction.DOWN);
 			}
 
-			if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+			if (RuntimeGlobals.input.isKeyJustPressed(Input.Keys.R)) {
+				Gdx.app.log("PuzzleScreen", "Resetting Level | " + frame);
 				level.resetLevel();
 			}
 		}
 
 
-		// if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+		// if (RuntimeGlobals.input.isKeyPressed(Input.Keys.Q)) {
 		// 	camera.rotate(-0.5f);
 		// }
-		// if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+		// if (RuntimeGlobals.input.isKeyPressed(Input.Keys.E)) {
 		// 	camera.rotate(0.5f);
 		// }
 

@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelParser;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
 import com.mrgorbunov.sliddingpuzzle.Screen.ScreenMainMenu;
+import com.mrgorbunov.sliddingpuzzle.Util.InputCache;
 
 public class GameRuntime extends Game {
 
@@ -18,6 +19,7 @@ public class GameRuntime extends Game {
 	public void create() {
 		RuntimeGlobals.skin = new Skin(Gdx.files.internal("skin/metal-ui.json"));
 		RuntimeGlobals.game = this;
+		RuntimeGlobals.input = new InputCache();
 
 		screen = new ScreenMainMenu();
 
@@ -44,6 +46,8 @@ public class GameRuntime extends Game {
 		super.render();
 		ScreenUtils.clear(0.4f, 0.8f, 0.3f, 1f);
 		screen.render(Gdx.graphics.getDeltaTime());
+
+		RuntimeGlobals.input.update();
 	}
 
 	@Override
