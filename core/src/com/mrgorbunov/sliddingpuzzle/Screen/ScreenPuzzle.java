@@ -29,7 +29,7 @@ import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelState;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
-import com.mrgorbunov.sliddingpuzzle.Util.LevelParser;
+import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelParser;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;

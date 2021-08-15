@@ -1,4 +1,4 @@
-package com.mrgorbunov.sliddingpuzzle.Util;
+package com.mrgorbunov.sliddingpuzzle.LevelLoading;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
