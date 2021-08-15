@@ -15,27 +15,27 @@ import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
 public class LevelParser {
 
 	// TODO: Add method to check if file is valid
+	// TODO: Read with buffered reader instead of into a string
 
 	/**
 	 * Returns a valid LevelState if the file is parsable,
 	 * otherwise null.
 	 */
 	public static LevelState parseFile (FileHandle file) {
-		String levelStr = file.readString();
+		String[] fileByLine = file.readString().split("\n");
 
-		String[] lineByLine = levelStr.split("\n");
-		if (lineByLine.length < 3) {
+		if (fileByLine.length < 3) {
 			Gdx.app.error("LevelParsing", "Improper level format - the file must be at least 3 lines long");
 			return null;
 		}
 
-		String versionStr = lineByLine[0];
+		String versionStr = fileByLine[0];
 		if (!versionStr.equals("V0.1")) {
 			Gdx.app.error("LevelParsing", "Unsupported level format version");
 			return null;
 		}
 
-		String[] lvlDimensionsStr = lineByLine[1].split(" ");
+		String[] lvlDimensionsStr = fileByLine[1].split(" ");
 		int width, height = 0;
 		try {
 			width = Integer.parseInt(lvlDimensionsStr[0]);
@@ -56,7 +56,7 @@ public class LevelParser {
 
 		for (int y=0; y<height; y++) {
 			int correctRow = height - y + 1;
-			char[] rowArr = lineByLine[correctRow].toCharArray();
+			char[] rowArr = fileByLine[correctRow].toCharArray();
 
 			for (int x=0; x<width; x++) {
 				char tileChar = rowArr[x];
@@ -94,6 +94,61 @@ public class LevelParser {
 		}
 
 		return new LevelState(levelMap, playerX, playerY);
+	}
+
+	/**
+	 * Will check if the file is valid without instancing a whole
+	 * LevelState. In terms of File I/O this is as expensive as parsing
+	 * the file, however if instancing LevelState ever becomes expensive
+	 * then this will save on that.
+	 */
+	public static boolean isValidFile (FileHandle file) {
+		String[] fileByLine = file.readString().split("\n");
+
+		if (fileByLine.length < 3)
+			return false;
+
+		String versionStr = fileByLine[0];
+		if (!versionStr.equals("V0.1"))
+			return false;
+		
+		String[] lvlDimensionsStr = fileByLine[1].split(" ");
+		int width = 0;
+		int height = 0;
+		try {
+			width = Integer.parseInt(lvlDimensionsStr[0]);
+			height = Integer.parseInt(lvlDimensionsStr[1]);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+
+		boolean playerFound = false;
+
+		for (int y=0; y<height; y++) {
+			char[] rowArr = fileByLine[height - y + 1].toCharArray();
+
+			for (int x=0; x<width; x++) {
+				char tileChar = rowArr[x];
+
+				switch (tileChar) {
+					case '*':
+					case '#':
+					case '$':
+						continue;
+					
+					case '&':
+						if (playerFound)
+							return false;
+						playerFound = true;
+						break;
+
+					default:
+						return false;
+				}
+			}
+		}
+
+		return playerFound;
 	}
 	
 }

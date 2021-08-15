@@ -29,7 +29,7 @@ public class GameRuntime extends Game {
 		Array<LevelInfo> validLevels = new Array<>(levelFiles.length);
 
 		for (FileHandle fh : levelFiles) {
-			if (LevelParser.parseFile(fh) != null)
+			if (LevelParser.isValidFile(fh))
 				validLevels.add(new LevelInfo(fh));
 		}
 
