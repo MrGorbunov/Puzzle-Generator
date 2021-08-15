@@ -39,7 +39,11 @@ public class LevelState {
 	public boolean levelIsBeat () { return currentState.isSolved; }
 
 	public void resetLevel () {
-		currentState = startState.clone();
+		moveStack = new DSStack<>();
+		redoStack = new DSStack<>();
+
+		moveStack.add(startState.clone());
+		currentState = moveStack.peekTop();
 	}
 
 	public boolean isValidMove (Direction dir) {
