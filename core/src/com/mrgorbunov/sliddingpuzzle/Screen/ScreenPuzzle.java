@@ -282,6 +282,15 @@ public class ScreenPuzzle implements Screen {
 			} else if (level.isValidMove(Direction.DOWN) &&
 				RuntimeGlobals.input.isKeyPressed(Input.Keys.DOWN)) {
 					makeMoveAndStartAnimation(Direction.DOWN);
+
+			} else if (RuntimeGlobals.input.isKeyJustPressed(Input.Keys.U)) {
+				Gdx.app.log("PuzzleScreen", "Undo input detected | " + frame);
+				level.undoMove();
+
+			} else if (RuntimeGlobals.input.isKeyJustPressed(Input.Keys.Y)) {
+				Gdx.app.log("PuzzleScreen", "Redo input detected | " + frame);
+				level.redoMove();
+
 			}
 
 			if (RuntimeGlobals.input.isKeyJustPressed(Input.Keys.R)) {
