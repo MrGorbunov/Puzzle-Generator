@@ -1,7 +1,7 @@
 - One way blocks?
 - Death blocks
 
-[ ] Undo & Redo w/ U & Y 
+[x] Undo & Redo w/ U & Y 
 [ ] restart should be r, then y (or n / esc if mistake)
 
 [~] Animations (eeh kinda done)

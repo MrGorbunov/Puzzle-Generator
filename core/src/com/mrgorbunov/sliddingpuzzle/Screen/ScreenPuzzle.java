@@ -140,14 +140,8 @@ public class ScreenPuzzle implements Screen {
 
 
 		// Button
+		// TODO: Create some better (in-program) mapping of hotkeys to actions?
 		TextButtonStyle buttonStyle = skin.get("default", TextButtonStyle.class);
-		TextButton butReset = new TextButton("Reset", buttonStyle);
-		butReset.addListener(new ChangeListener() {
-			public void changed (ChangeEvent event, Actor actor) {
-				level.resetLevel();
-			}
-		});
-
 		TextButton butBack = new TextButton("Back", buttonStyle);
 		butBack.addListener(new ChangeListener () {
 			public void changed (ChangeEvent event, Actor actor) {
@@ -155,10 +149,42 @@ public class ScreenPuzzle implements Screen {
 			}
 		});
 
+		TextButton butReset = new TextButton("(R)eset", buttonStyle);
+		butReset.addListener(new ChangeListener() {
+			public void changed (ChangeEvent event, Actor actor) {
+				level.resetLevel();
+			}
+		});
+
+		TextButton butUndo = new TextButton("(U)ndo", buttonStyle);
+		butBack.addListener(new ChangeListener () {
+			public void changed (ChangeEvent event, Actor actor) {
+				level.undoMove();
+			}
+		});
+
+		TextButton butRedo = new TextButton("(Y) Redo", buttonStyle);
+		butBack.addListener(new ChangeListener () {
+			public void changed (ChangeEvent event, Actor actor) {
+				level.redoMove();
+			}
+		});
+
+
+
 		// TextButton button = new TextButton("Oompa Loompa", skin, "default");
-		table.add(butBack);
+		Table backSubTable = new Table(skin);
+		backSubTable.padBottom(10f);
+		backSubTable.add(butBack);
+
+		table.add(backSubTable);
 		table.row();
 		table.add(butReset);
+		table.row();
+		table.add(butUndo);
+		table.row();
+		table.add(butRedo);
+		table.row();
 
 		table.left();
 		table.top();
