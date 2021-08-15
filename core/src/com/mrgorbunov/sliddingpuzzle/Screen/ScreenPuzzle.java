@@ -134,7 +134,7 @@ public class ScreenPuzzle implements Screen {
 
 		table = new Table();
 		table.setFillParent(true);
-		stage.addActor(table);;
+		stage.addActor(table);
 
 		// table.setDebug(true);
 
@@ -157,14 +157,15 @@ public class ScreenPuzzle implements Screen {
 		});
 
 		TextButton butUndo = new TextButton("(U)ndo", buttonStyle);
-		butBack.addListener(new ChangeListener () {
+		butUndo.addListener(new ChangeListener () {
 			public void changed (ChangeEvent event, Actor actor) {
+				Gdx.app.log("ScreenPuzzle", "Hello?");
 				level.undoMove();
 			}
 		});
 
 		TextButton butRedo = new TextButton("(Y) Redo", buttonStyle);
-		butBack.addListener(new ChangeListener () {
+		butRedo.addListener(new ChangeListener () {
 			public void changed (ChangeEvent event, Actor actor) {
 				level.redoMove();
 			}
@@ -189,8 +190,6 @@ public class ScreenPuzzle implements Screen {
 		table.left();
 		table.top();
 		table.pad(50);
-
-
 	}
 
 
