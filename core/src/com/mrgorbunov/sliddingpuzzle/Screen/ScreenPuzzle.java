@@ -94,7 +94,6 @@ public class ScreenPuzzle implements Screen {
 			Gdx.app.exit();
 			System.exit(0);
 		}
-		level.printLevel();
 
 		// Texture loading
 		batch = new SpriteBatch();
@@ -159,7 +158,6 @@ public class ScreenPuzzle implements Screen {
 		TextButton butUndo = new TextButton("(U)ndo", buttonStyle);
 		butUndo.addListener(new ChangeListener () {
 			public void changed (ChangeEvent event, Actor actor) {
-				Gdx.app.log("ScreenPuzzle", "Hello?");
 				level.undoMove();
 			}
 		});
@@ -309,17 +307,14 @@ public class ScreenPuzzle implements Screen {
 					makeMoveAndStartAnimation(Direction.DOWN);
 
 			} else if (RuntimeGlobals.input.isKeyJustPressed(Input.Keys.U)) {
-				Gdx.app.log("PuzzleScreen", "Undo input detected | " + frame);
 				level.undoMove();
 
 			} else if (RuntimeGlobals.input.isKeyJustPressed(Input.Keys.Y)) {
-				Gdx.app.log("PuzzleScreen", "Redo input detected | " + frame);
 				level.redoMove();
 
 			}
 
 			if (RuntimeGlobals.input.isKeyJustPressed(Input.Keys.R)) {
-				Gdx.app.log("PuzzleScreen", "Resetting Level | " + frame);
 				level.resetLevel();
 			}
 		}

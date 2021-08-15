@@ -17,7 +17,6 @@ public class DSStack<T> {
 
 	public DSStack () {
 		arr = new Array<>();
-		Gdx.app.log("StackCommands", "Made new stack");
 	}
 
 	public int size () {
@@ -31,7 +30,6 @@ public class DSStack<T> {
 	 * Returns null if the Stack is empty
 	 */
 	public T peekTop () {
-		Gdx.app.log("StackCommands", "Peeked at top with size = " + size());
 		if (arr.size == 0)
 			return null;
 
@@ -39,12 +37,10 @@ public class DSStack<T> {
 	}
 
 	public T pop () {
-		Gdx.app.log("StackCommands", "Popped stack");
 		return arr.pop();
 	}
 
 	public void add (T elm) {
-		Gdx.app.log("StackCommands", "Added element: " + elm);
 		arr.add(elm);
 	}
 	

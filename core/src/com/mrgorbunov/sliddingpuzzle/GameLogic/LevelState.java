@@ -27,7 +27,6 @@ public class LevelState {
 		redoStack = new DSStack<>();
 
 		currentState = moveStack.peekTop();
-		System.out.println(currentState.toString());
 	}
 
 	public int getWidth () { return WIDTH; }
@@ -56,6 +55,7 @@ public class LevelState {
 			layout[testX][testY] != Tile.WALL;
 	}
 
+	// TODO: have makeMove return the new game state, and check for valid move
 	/**
 	 * Moves the player along the specified direction until either
 	 * hitting a wall or the exit. Does nothing if the level is beat
@@ -106,8 +106,6 @@ public class LevelState {
 	}
 
 	public void undoMove () {
-		Gdx.app.log("LevelState", "Undoing move");
-
 		if (moveStack.size() == 1)
 			return;
 		
@@ -131,27 +129,32 @@ public class LevelState {
 	public boolean canRedo () { return redoStack.size() > 0; }
 
 	public void printLevel () {
+		StringBuilder levelLine;
+		Gdx.app.log("LevelState", "=== Printing Level ===");
+
 		for (int y=HEIGHT-1; y>=0; y--) {
+			levelLine = new StringBuilder(WIDTH);
+
 			for (int x=0; x<WIDTH; x++) {
 				if (x == currentState.playerX && y == currentState.playerY) {
-					System.out.print("&");
+					levelLine.append("&");
 					continue;
 				}
 
 				switch (layout[x][y]) {
 					case FINISH:
-						System.out.print("$");
+						levelLine.append("$");
 						break;
 					case FLOOR:
-						System.out.print("*");
+						levelLine.append("*");
 						break;
 					case WALL:
-						System.out.print("#");
+						levelLine.append("#");
 						break;
 				}
 			}
 
-			System.out.println();
+			Gdx.app.log("LevelState", levelLine.toString());
 		}
 	}
 	
