@@ -1,7 +1,9 @@
-package com.mrgorbunov.sliddingpuzzle.GameLogic;
+package com.mrgorbunov.sliddingpuzzle.Util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelState;
+import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
 
 /**
  * This classes parses level files. 
@@ -11,6 +13,8 @@ import com.badlogic.gdx.files.FileHandle;
  * file (in core/assets/levels/)
  */
 public class LevelParser {
+
+	// TODO: Add method to check if file is valid
 
 	/**
 	 * Returns a valid LevelState if the file is parsable,

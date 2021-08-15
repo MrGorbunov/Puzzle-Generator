@@ -8,10 +8,10 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelParser;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
 import com.mrgorbunov.sliddingpuzzle.Screen.ScreenMainMenu;
 import com.mrgorbunov.sliddingpuzzle.Util.InputCache;
+import com.mrgorbunov.sliddingpuzzle.Util.LevelParser;
 
 public class GameRuntime extends Game {
 
