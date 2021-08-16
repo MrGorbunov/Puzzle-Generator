@@ -25,9 +25,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mrgorbunov.sliddingpuzzle.RuntimeGlobals;
-import com.mrgorbunov.sliddingpuzzle.GameAnnotations.LevelSearch;
+import com.mrgorbunov.sliddingpuzzle.GameAnnotations.MoveGraphGenerator;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
-import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelState;
+import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleLevel;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelParser;
@@ -50,7 +50,7 @@ public class ScreenPuzzle implements Screen {
 	TextureRegion background;
 	int tileSizePx;
 
-	LevelState level;
+	PuzzleLevel level;
 
 	boolean animationPlaying;
 
@@ -97,7 +97,7 @@ public class ScreenPuzzle implements Screen {
 			System.exit(0);
 		}
 
-		GraphAlgs.debugGraph(LevelSearch.getMoveGraph(level));
+		GraphAlgs.debugGraph(MoveGraphGenerator.getMoveGraph(level));
 
 		// Texture loading
 		batch = new SpriteBatch();

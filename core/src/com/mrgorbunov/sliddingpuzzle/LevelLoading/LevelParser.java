@@ -2,7 +2,7 @@ package com.mrgorbunov.sliddingpuzzle.LevelLoading;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelState;
+import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleLevel;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
 
 /**
@@ -21,7 +21,7 @@ public class LevelParser {
 	 * Returns a valid LevelState if the file is parsable,
 	 * otherwise null.
 	 */
-	public static LevelState parseFile (FileHandle file) {
+	public static PuzzleLevel parseFile (FileHandle file) {
 		String[] fileByLine = file.readString().split("\n");
 
 		if (fileByLine.length < 3) {
@@ -93,7 +93,7 @@ public class LevelParser {
 			}
 		}
 
-		return new LevelState(levelMap, playerX, playerY);
+		return new PuzzleLevel(levelMap, playerX, playerY);
 	}
 
 	/**

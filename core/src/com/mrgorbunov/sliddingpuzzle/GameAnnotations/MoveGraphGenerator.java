@@ -14,14 +14,14 @@ import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
-import com.mrgorbunov.sliddingpuzzle.GameLogic.LevelState;
+import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleLevel;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleState;
 import com.mrgorbunov.sliddingpuzzle.Util.DSNode;
 import com.mrgorbunov.sliddingpuzzle.Util.GraphAlgs;
 
-public final class LevelSearch {
+public final class MoveGraphGenerator {
 
-	private LevelSearch () { }
+	private MoveGraphGenerator () { }
 
 	/**
 	 * Constructs a graph all possible moves, starting with the current
@@ -29,8 +29,8 @@ public final class LevelSearch {
 	 * 
 	 * Does so by perfoming a BFS
 	 */
-	public static DSNode<PuzzleState>[] getMoveGraph (LevelState levelAtStart) {
-		LevelState level = levelAtStart.clone();
+	public static DSNode<PuzzleState>[] getMoveGraph (PuzzleLevel levelAtStart) {
+		PuzzleLevel level = levelAtStart.clone();
 		int width = level.getWidth();
 		int height = level.getHeight();
 

@@ -5,7 +5,7 @@ import com.mrgorbunov.sliddingpuzzle.Util.DSStack;
 
 // TODO: Maybe seperate out move logic from undo & redo logic?
 
-public class LevelState {
+public class PuzzleLevel {
 
 	final int WIDTH;
 	final int HEIGHT;
@@ -16,7 +16,7 @@ public class LevelState {
 	DSStack<PuzzleState> moveStack;
 	DSStack<PuzzleState> redoStack; // used to handle redoing
 
-	public LevelState (Tile[][] layout, int playerX, int playerY) {
+	public PuzzleLevel (Tile[][] layout, int playerX, int playerY) {
 		this.layout = layout;
 		WIDTH = layout.length;
 		HEIGHT = layout[0].length;
@@ -36,8 +36,8 @@ public class LevelState {
 	 * safe mutations w/o affecting this object.
 	 */
 	@Override
-	public LevelState clone () {
-		return new LevelState(layout.clone(), currentState.playerX, currentState.playerY);
+	public PuzzleLevel clone () {
+		return new PuzzleLevel(layout.clone(), currentState.playerX, currentState.playerY);
 	}
 
 	public int getWidth () { return WIDTH; }
