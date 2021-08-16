@@ -51,8 +51,10 @@ public class ScreenLevelSelect implements Screen {
 
 			levelTable.add(levelButton);
 			numInRow++;
-			if (numInRow >= ROW_SIZE)
+			if (numInRow >= ROW_SIZE) {
 				levelTable.row();
+				numInRow = 0;
+			}
 		}
 
 		rootTable.add(levelTable);
