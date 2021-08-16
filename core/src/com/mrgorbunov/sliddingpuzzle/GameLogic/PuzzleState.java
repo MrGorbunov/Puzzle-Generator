@@ -1,6 +1,6 @@
 package com.mrgorbunov.sliddingpuzzle.GameLogic;
 
-public class PuzzleDynamicsState {
+public class PuzzleState {
 
 	// NOTE: When adding new fields, update .equals() & .toString()
 	public final int playerX;
@@ -14,15 +14,15 @@ public class PuzzleDynamicsState {
 	 * 
 	 * Right now, that's player position & whether the level is beat
 	 */
-	public PuzzleDynamicsState (int playerX, int playerY, boolean isSolved) {
+	public PuzzleState (int playerX, int playerY, boolean isSolved) {
 		this.playerX = playerX;
 		this.playerY = playerY;
 		this.isSolved = isSolved;
 	}
 
 	@Override
-	public PuzzleDynamicsState clone () {
-		return new PuzzleDynamicsState(playerX, playerY, isSolved);
+	public PuzzleState clone () {
+		return new PuzzleState(playerX, playerY, isSolved);
 	}
 
 	@Override
@@ -30,10 +30,10 @@ public class PuzzleDynamicsState {
 		if (o == this)
 			return true;
 		
-		if (!(o instanceof PuzzleDynamicsState))
+		if (!(o instanceof PuzzleState))
 			return false;
 
-		PuzzleDynamicsState otherState = (PuzzleDynamicsState) o;
+		PuzzleState otherState = (PuzzleState) o;
 
 		return otherState.playerX == playerX &&
 			   otherState.playerY == playerY &&
@@ -42,6 +42,6 @@ public class PuzzleDynamicsState {
 
 	@Override
 	public String toString () {
-		return String.format("{ playerX: %d, playerY: %d, solved: $b }", playerX, playerY, isSolved);
+		return String.format("{ playerX: %d, playerY: %d, solved: %b }", playerX, playerY, isSolved);
 	}
 }
