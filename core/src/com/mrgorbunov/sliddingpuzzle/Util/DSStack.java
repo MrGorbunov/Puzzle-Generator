@@ -1,6 +1,5 @@
 package com.mrgorbunov.sliddingpuzzle.Util;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 
 /**

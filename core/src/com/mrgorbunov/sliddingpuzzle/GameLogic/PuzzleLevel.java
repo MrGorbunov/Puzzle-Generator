@@ -122,7 +122,6 @@ public class PuzzleLevel {
 		return new PuzzleState(testX, testY, solvedState);
 	}
 
-	// TODO: have makeMove return the new game state, and check for valid move
 	/**
 	 * Moves the player along the specified direction until either
 	 * hitting a wall or the exit. Does nothing if the level is beat

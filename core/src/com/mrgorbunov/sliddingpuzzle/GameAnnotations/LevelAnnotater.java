@@ -1,6 +1,5 @@
 package com.mrgorbunov.sliddingpuzzle.GameAnnotations;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;

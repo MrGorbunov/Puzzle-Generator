@@ -14,7 +14,6 @@ import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
  */
 public class LevelParser {
 
-	// TODO: Add method to check if file is valid
 	// TODO: Read with buffered reader instead of into a string
 
 	/**

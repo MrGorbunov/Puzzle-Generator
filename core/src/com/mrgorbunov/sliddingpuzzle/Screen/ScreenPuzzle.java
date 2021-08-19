@@ -2,46 +2,32 @@ package com.mrgorbunov.sliddingpuzzle.Screen;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.utils.Logger;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mrgorbunov.sliddingpuzzle.RuntimeGlobals;
 import com.mrgorbunov.sliddingpuzzle.GameAnnotations.LevelAnnotater;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleLevel;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleState;
-import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelParser;
 import com.mrgorbunov.sliddingpuzzle.Util.DSNode;
-import com.mrgorbunov.sliddingpuzzle.Util.GraphAlgs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.files.FileHandle;
 
 public class ScreenPuzzle implements Screen {
-
-	private long frame;
 
 	SpriteBatch batch;
 	OrthographicCamera camera;
@@ -93,8 +79,6 @@ public class ScreenPuzzle implements Screen {
 
 	public ScreenPuzzle () {
 		Gdx.app.log("PuzzleScreen", "Constructing new puzzle screen");
-
-		frame = 0;
 
 		// Load level
 		LevelInfo activeLevel = RuntimeGlobals.activeLevel;
@@ -216,8 +200,6 @@ public class ScreenPuzzle implements Screen {
 		//
 		// Updating Call
 		//
-		frame++;
-
 		handleInput();
 
 
