@@ -1,16 +1,6 @@
-/**
- * Level Search
- * 
- * This class will search through all possible moves of a level,
- * constructing a graph of PuzzleStates with directions as edges.
- */
-
 package com.mrgorbunov.sliddingpuzzle.GameAnnotations;
 
-import java.util.Arrays;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
@@ -19,23 +9,28 @@ import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleState;
 import com.mrgorbunov.sliddingpuzzle.Util.DSNode;
 import com.mrgorbunov.sliddingpuzzle.Util.GraphAlgs;
 
-public final class MoveGraphGenerator {
+public class LevelAnnotater {
+	
+	public Array<DSNode<PuzzleState>> moveGraph;
 
-	private MoveGraphGenerator () { }
+	public LevelAnnotater (PuzzleLevel levelStart) {
+		generateMoveGraph(levelStart);
+		GraphAlgs.debugGraph(moveGraph);
+	}
 
 	/**
-	 * Constructs a graph all possible moves, starting with the current
+	 * Constructs a graph all possible moves, starting from the current
 	 * player location in the level.
 	 * 
-	 * Does so by perfoming a BFS
+	 * Move graph is stored in instance variable moveGraph
 	 */
-	public static DSNode<PuzzleState>[] getMoveGraph (PuzzleLevel levelAtStart) {
+	private void generateMoveGraph (PuzzleLevel levelAtStart) {
 		PuzzleLevel level = levelAtStart.clone();
 		int width = level.getWidth();
 		int height = level.getHeight();
 
 		// TODO: Use array & insertion sort instead of memo (dp) array!
-		Array<DSNode<PuzzleState>> moveGraphObject = new Array<>();
+		Array<DSNode<PuzzleState>> movesFound = new Array<>();
 		int nextIndex = 0;	
 		// The size of this memo array grows as level states become more dynamic (currently only depend on position)
 		int[][] nodeIndexes = new int[width][height]; 
@@ -48,13 +43,9 @@ public final class MoveGraphGenerator {
 		Queue<PuzzleState> statesToConsider = new Queue<>();
 		Array<Boolean> indexAlreadyVisited = new Array<>(width * height / 4); // just a dumb heuristic
 
-		Gdx.app.log("LevelSearch", "Started BFS");
-
 		statesToConsider.addFirst(level.getCurrentState());
 
 		while (statesToConsider.size > 0) {
-			Gdx.app.log("LevelSearch", "BFS Iteration; Queue size: " + statesToConsider.size);
-
 			PuzzleState nextState = statesToConsider.removeLast();
 
 			int x = nextState.playerX;
@@ -104,23 +95,11 @@ public final class MoveGraphGenerator {
 			}
 
 			DSNode<PuzzleState> nextNode = new DSNode<>(nextState, neighbours);
-			moveGraphObject.add(nextNode);
+			movesFound.add(nextNode);
 		}
 
-		Gdx.app.log("LevelSearch", "BFS Done, now converting datatype");
-
-		int numNodes = moveGraphObject.size;
-		DSNode<PuzzleState> classReference = new DSNode<PuzzleState>(null, null);
-		DSNode<PuzzleState>[] moveGraph = (DSNode<PuzzleState>[]) java.lang.reflect.Array.newInstance(classReference.getClass(), numNodes);
-
-		for (int i=0; i<numNodes; i++) {
-			moveGraph[i] = moveGraphObject.get(i);
-		}
-
-		Gdx.app.log("LevelSearch", "Conversion done, returning");
-
-		return moveGraph;
+		moveGraph = movesFound;
 	}
-	
-}
 
+
+}

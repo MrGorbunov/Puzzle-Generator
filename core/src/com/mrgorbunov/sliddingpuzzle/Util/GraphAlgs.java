@@ -1,6 +1,7 @@
 package com.mrgorbunov.sliddingpuzzle.Util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * Graph Algorithms
@@ -12,15 +13,16 @@ public final class GraphAlgs {
 
 	private GraphAlgs () {}
 
-	public static void debugGraph (DSNode<?>[] nodes) {
+	public static <T> void debugGraph (Array<DSNode<T>> nodes) {
 		Gdx.app.log("GraphAlgs", "=== Printing Graph ===");
 		Gdx.app.log("GraphAlgs", "Edge ordering: UP, RIGHT, DOWN, LEFT");
 
 		DSNode<?> node;
 		StringBuilder edgeStr;
 
-		for (int i=0; i<nodes.length; i++) {
-			node = nodes[i];
+		int numNodes = nodes.size;
+		for (int i=0; i<numNodes; i++) {
+			node = nodes.get(i);
 			Gdx.app.log("GraphAlgs", String.format("%3d | %s", i, node.elm.toString()));
 
 			edgeStr = new StringBuilder();

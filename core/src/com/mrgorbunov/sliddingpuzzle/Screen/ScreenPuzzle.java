@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -25,12 +26,14 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mrgorbunov.sliddingpuzzle.RuntimeGlobals;
-import com.mrgorbunov.sliddingpuzzle.GameAnnotations.MoveGraphGenerator;
+import com.mrgorbunov.sliddingpuzzle.GameAnnotations.LevelAnnotater;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Direction;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleLevel;
+import com.mrgorbunov.sliddingpuzzle.GameLogic.PuzzleState;
 import com.mrgorbunov.sliddingpuzzle.GameLogic.Tile;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelInfo;
 import com.mrgorbunov.sliddingpuzzle.LevelLoading.LevelParser;
+import com.mrgorbunov.sliddingpuzzle.Util.DSNode;
 import com.mrgorbunov.sliddingpuzzle.Util.GraphAlgs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -42,6 +45,9 @@ public class ScreenPuzzle implements Screen {
 
 	SpriteBatch batch;
 	OrthographicCamera camera;
+
+	Texture texHighlight;
+	Sprite spriteHighlight;
 
 	Texture texWall;
 	Texture texFloor;
@@ -74,6 +80,9 @@ public class ScreenPuzzle implements Screen {
 	final long ACCEL_TIME_MILLIS = 250;
 
 
+	// Annotations
+	private LevelAnnotater annotater;
+	final float ANNOTATION_SQUARE_ALPHA = 0.4f;
 
 	// GUI
 	private Stage stage;
@@ -97,10 +106,13 @@ public class ScreenPuzzle implements Screen {
 			System.exit(0);
 		}
 
-		GraphAlgs.debugGraph(MoveGraphGenerator.getMoveGraph(level));
+		annotater = new LevelAnnotater(level);
 
 		// Texture loading
 		batch = new SpriteBatch();
+
+		texHighlight = new Texture(Gdx.files.internal("img/highlighted_square.png"));
+		spriteHighlight = new Sprite(texHighlight);
 
 		texWall = new Texture(Gdx.files.internal("img/wall.png"));
 		texFloor = new Texture(Gdx.files.internal("img/floor.png"));
@@ -219,7 +231,33 @@ public class ScreenPuzzle implements Screen {
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
+		drawLevelLayout();
 
+		spriteHighlight.setColor(1f, 0f, 0f, ANNOTATION_SQUARE_ALPHA);
+
+		for (DSNode<PuzzleState> possibleState : annotater.moveGraph.iterator()) {
+			spriteHighlight.setX(possibleState.elm.playerX * tileSizePx);
+			spriteHighlight.setY(possibleState.elm.playerY * tileSizePx);
+			spriteHighlight.draw(batch);
+		}
+
+		drawPlayer();
+
+		batch.end();
+
+
+		//
+		// GUI Call
+		
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
+	}
+
+
+	/**
+	 * Assumes the batch has begun
+	 */
+	void drawLevelLayout () {
 		batch.draw(background, -20 * tileSizePx, -20 * tileSizePx);
 
 		// Draw the game map
@@ -245,8 +283,10 @@ public class ScreenPuzzle implements Screen {
 				batch.draw(tileTex, x * tileSizePx, y * tileSizePx);
 			}
 		}
+	}
 
-		// Draw the player
+
+	void drawPlayer () {
 		if (animationPlaying) {
 			animationTick();
 
@@ -259,16 +299,6 @@ public class ScreenPuzzle implements Screen {
 			int playerPxY = level.getPlayerY() * tileSizePx;
 			batch.draw(texPlayer, playerPxX, playerPxY);
 		}
-
-
-		batch.end();
-
-
-		//
-		// GUI Call
-		
-		stage.act(Gdx.graphics.getDeltaTime());
-		stage.draw();
 	}
 
 
