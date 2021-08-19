@@ -12,7 +12,6 @@ public class PuzzleLevel {
 	Tile[][] layout; // [0][0] = bottom left
 
 	PuzzleState startState;
-	PuzzleState currentState; // TODO: Not use this variable
 	DSStack<PuzzleState> moveStack;
 	DSStack<PuzzleState> redoStack; // used to handle redoing
 
@@ -27,8 +26,6 @@ public class PuzzleLevel {
 		moveStack.add(startState.clone());
 
 		redoStack = new DSStack<>();
-
-		currentState = moveStack.peekTop();
 	}
 
 	/**
@@ -37,32 +34,29 @@ public class PuzzleLevel {
 	 */
 	@Override
 	public PuzzleLevel clone () {
-		return new PuzzleLevel(layout.clone(), currentState.playerX, currentState.playerY);
+		PuzzleState curState = moveStack.peekTop();
+		return new PuzzleLevel(layout.clone(), curState.playerX, curState.playerY);
 	}
 
 	public int getWidth () { return WIDTH; }
 	public int getHeight () { return HEIGHT; }
-	public int getPlayerX () { return currentState.playerX; }
-	public int getPlayerY () { return currentState.playerY; }
+	public int getPlayerX () { return moveStack.peekTop().playerX; }
+	public int getPlayerY () { return moveStack.peekTop().playerY; }
 	public Tile[][] getLayout () { return layout; }
-	public boolean levelIsBeat () { return currentState.isSolved; }
-	public PuzzleState getCurrentState () { return currentState; }
+	public boolean levelIsBeat () { return moveStack.peekTop().isSolved; }
+	public PuzzleState getCurrentState () { return moveStack.peekTop(); }
 
 	public void setCurrentState (PuzzleState state) { 
 		setCurrentState(state, true);
 	}
 
-	public void setCurrentState (PuzzleState state, boolean affectMoveStacks) {
-		if (affectMoveStacks) {
+	public void setCurrentState (PuzzleState state, boolean resetMoveStacks) {
+		if (resetMoveStacks) {
 			moveStack = new DSStack<>();
 			redoStack = new DSStack<>();
-
-			moveStack.add(state);
-			currentState = moveStack.peekTop(); 
-
-		} else {
-			currentState = state;
 		}
+
+		moveStack.add(state);
 	}
 
 	public void resetLevel () {
@@ -70,29 +64,30 @@ public class PuzzleLevel {
 		redoStack = new DSStack<>();
 
 		moveStack.add(startState.clone());
-		currentState = moveStack.peekTop();
 	}
 
 	public boolean isValidMove (Direction dir) {
 		int[] delta = dir.getDelta();
 
-		int testX = currentState.playerX + delta[0];
-		int testY = currentState.playerY + delta[1];
+		PuzzleState curState = moveStack.peekTop();
+		int testX = curState.playerX + delta[0];
+		int testY = curState.playerY + delta[1];
 
 		return (testX >= 0 && testX < WIDTH && testY >= 0 && testY < HEIGHT) &&
 			layout[testX][testY] != Tile.WALL;
 	}
 
 	public PuzzleState simulateMove (Direction dir) {
-		if (currentState.isSolved ||
-			!isValidMove(dir))
-				return null;
+		PuzzleState curState = moveStack.peekTop();
+
+		if (curState.isSolved || !isValidMove(dir))
+			return null;
 
 		int[] delta = dir.getDelta();
 
-		int testX = currentState.playerX;
-		int testY = currentState.playerY;
-		boolean solvedState = currentState.isSolved;
+		int testX = curState.playerX;
+		int testY = curState.playerY;
+		boolean solvedState = curState.isSolved;
 
 		// if state is solved, the move shouldn't be evaluating
 		assert(solvedState == false);
@@ -128,15 +123,17 @@ public class PuzzleLevel {
 	 * or inside a wall.
 	 */
 	public void makeMove (Direction dir) {
+		PuzzleState curState = moveStack.peekTop();
+
 		// Don't allow moving out of the goal
-		if (currentState.isSolved)
+		if (curState.isSolved)
 			return;
 
 		int[] delta = dir.getDelta();
 
-		int testX = currentState.playerX;
-		int testY = currentState.playerY;
-		boolean solvedState = currentState.isSolved;
+		int testX = curState.playerX;
+		int testY = curState.playerY;
+		boolean solvedState = curState.isSolved;
 
 		// if state is solved, the move shouldn't be evaluating
 		assert(solvedState == false);
@@ -164,9 +161,8 @@ public class PuzzleLevel {
 		}
 
 		moveStack.add(new PuzzleState(testX, testY, solvedState));
-		currentState = moveStack.peekTop();
 
-		// Reset redo stack after makign a move
+		// Reset redo stack after making a move
 		if (redoStack.size() != 0)
 			redoStack = new DSStack<>();
 	}
@@ -177,8 +173,6 @@ public class PuzzleLevel {
 		
 		PuzzleState prevMove = moveStack.pop();
 		redoStack.add(prevMove);
-
-		currentState = moveStack.peekTop();
 	}
 
 	public void redoMove () {
@@ -187,14 +181,14 @@ public class PuzzleLevel {
 
 		PuzzleState moveToRedo = redoStack.pop();
 		moveStack.add(moveToRedo);
-
-		currentState = moveStack.peekTop();
 	}
 
 	public boolean canUndo () { return moveStack.size() > 1; }
 	public boolean canRedo () { return redoStack.size() > 0; }
 
 	public void printLevel () {
+		PuzzleState curState = moveStack.peekTop();
+
 		StringBuilder levelLine;
 		Gdx.app.log("LevelState", "=== Printing Level ===");
 
@@ -202,7 +196,7 @@ public class PuzzleLevel {
 			levelLine = new StringBuilder(WIDTH);
 
 			for (int x=0; x<WIDTH; x++) {
-				if (x == currentState.playerX && y == currentState.playerY) {
+				if (x == curState.playerX && y == curState.playerY) {
 					levelLine.append("&");
 					continue;
 				}
